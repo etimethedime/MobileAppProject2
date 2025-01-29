@@ -5,12 +5,14 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FDFDFD"
     tools:context=".Chapter4_MyContactsActivity">
 
     <LinearLayout
         android:id="@+id/linearLayout2"
-        android:layout_width="406dp"
-        android:layout_height="77dp"
+        android:layout_width="409dp"
+        android:layout_height="65dp"
+        android:background="#4B3083"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -20,9 +22,11 @@
 
         <ImageButton
             android:id="@+id/imageButton6"
-            android:layout_width="66dp"
+            android:layout_width="73dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:backgroundTint="#7799BF"
+            android:backgroundTintMode="src_in"
             android:scaleType="fitCenter"
             android:src="@drawable/menu" />
 
@@ -31,6 +35,8 @@
             android:layout_width="73dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:backgroundTint="#7799BF"
+            android:backgroundTintMode="src_in"
             android:scaleType="fitCenter"
             android:src="@drawable/location" />
 
@@ -39,6 +45,8 @@
             android:layout_width="76dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:backgroundTint="#7799BF"
+            android:backgroundTintMode="src_in"
             android:scaleType="fitCenter"
             android:src="@drawable/settings" />
 
@@ -206,14 +214,34 @@
                 android:layout_weight="1" />
 
             <Button
-                android:id="@+id/saveButton"
+                android:id="@+id/saveButton2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Save"
+                android:text="SAVE"
                 android:textSize="16sp" />
         </LinearLayout>
 
     </LinearLayout>
+
+    <EditText
+        android:id="@+id/birthdayText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Birthday"
+        android:inputType="date"
+        tools:layout_editor_absoluteX="29dp"
+        tools:layout_editor_absoluteY="514dp" />
+
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="CHANGE"
+        android:textSize="16sp"
+        tools:layout_editor_absoluteX="271dp"
+        tools:layout_editor_absoluteY="515dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
