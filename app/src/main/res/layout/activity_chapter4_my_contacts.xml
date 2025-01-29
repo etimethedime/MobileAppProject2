@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Chapter4_MyContactList">
+    tools:context=".Chapter4_MyContactsActivity">
 
     <LinearLayout
         android:id="@+id/linearLayout2"
