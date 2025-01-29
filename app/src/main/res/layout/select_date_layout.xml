@@ -11,15 +11,32 @@
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="138dp">
 
-        <CalendarView
-            android:id="@+id/calendarView"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="340dp"
+            android:orientation="horizontal">
+
+            <CalendarView
+                android:id="@+id/calendarView"
+                android:layout_width="594dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <Space
+                android:layout_width="291dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
+            <Space
+                android:layout_width="141dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <Button
                 android:id="@+id/cancelButton"
@@ -29,16 +46,21 @@
                 android:text="CANCEL" />
 
             <Space
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="33dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1" />
 
             <Button
-                android:id="@+id/selectButton"
+                android:id="@+id/saveDateButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="SELECT" />
+                android:text="SAVE" />
+
+            <Space
+                android:layout_width="33dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

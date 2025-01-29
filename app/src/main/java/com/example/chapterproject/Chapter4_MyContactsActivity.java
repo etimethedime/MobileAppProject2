@@ -2,17 +2,22 @@ package com.example.chapterproject;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import androidx.activity.EdgeToEdge;
+import android.text.format.DateFormat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class Chapter4_MyContactsActivity extends AppCompatActivity {
+import java.util.Calendar;
+
+public class Chapter4_MyContactsActivity extends AppCompatActivity implements DatePickerDialogue.SaveDateListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +35,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity {
         initSettingsButton();
         initToggleButton();
         setForEditing(false);
+        initChangeDateButton();
 
     }
 
@@ -87,5 +93,20 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity {
            editName.requestFocus();
        }
 
+    }
+
+    private void initChangeDateButton() {
+        Button changeDateButton = findViewById(R.id.changeBirthdayButton);
+        changeDateButton.setOnClickListener(v -> {
+            DatePickerDialogue datePickerDialogue = new DatePickerDialogue();
+            datePickerDialogue.show(getSupportFragmentManager(), "date picker");
+        });
+    }
+
+
+    @Override
+    public void didFinishDatePickerDialog(Calendar selectedDate) {
+        TextView birthDay = findViewById(R.id.birthdayText);
+        birthDay.setText(DateFormat.format("MM/dd/yyyy", selectedDate));
     }
 }
