@@ -79,6 +79,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
        EditText editCell = findViewById(R.id.cellNumberText);
        EditText editHome = findViewById(R.id.homePhoneText);
        EditText editEmail = findViewById(R.id.emailText);
+       EditText editBirthday = findViewById(R.id.birthdayText);
 
        editName.setEnabled(enabled);
        editStreet.setEnabled(enabled);
@@ -88,6 +89,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
        editCell.setEnabled(enabled);
        editHome.setEnabled(enabled);
        editEmail.setEnabled(enabled);
+       editBirthday.setEnabled(enabled);
 
        if (enabled) {
            editName.requestFocus();
