@@ -215,7 +215,7 @@
                 android:layout_weight="1" />
 
             <Button
-                android:id="@+id/saveButton2"
+                android:id="@+id/saveButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

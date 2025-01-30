@@ -105,10 +105,10 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
         });
     }
 
-
     @Override
     public void didFinishDatePickerDialog(Calendar selectedDate) {
         TextView birthDay = findViewById(R.id.birthdayText);
         birthDay.setText(DateFormat.format("MM/dd/yyyy", selectedDate));
     }
+
 }
