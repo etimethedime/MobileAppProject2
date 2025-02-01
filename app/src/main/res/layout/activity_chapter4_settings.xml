@@ -6,5 +6,111 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Chapter4_SettingsActivity">
+    <LinearLayout
+        android:id="@+id/navigationBar"
+        android:layout_width="409dp"
+        android:layout_height="65dp"
+        android:background="#4B3083"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.996">
+
+        <ImageButton
+            android:id="@+id/contactListButton"
+            android:layout_width="73dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:backgroundTint="#7799BF"
+            android:backgroundTintMode="src_in"
+            android:scaleType="fitCenter"
+            android:src="@drawable/menu" />
+
+        <ImageButton
+            android:id="@+id/contactMapButton"
+            android:layout_width="73dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:backgroundTint="#7799BF"
+            android:backgroundTintMode="src_in"
+            android:scaleType="fitCenter"
+            android:src="@drawable/location" />
+
+        <ImageButton
+            android:id="@+id/contactSettingsButton"
+            android:layout_width="76dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:backgroundTint="#7799BF"
+            android:backgroundTintMode="src_in"
+            android:contentDescription="Settings Button"
+            android:scaleType="fitCenter"
+            android:src="@drawable/settings" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/categoryText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sort Contacts By:"
+        android:textSize="16sp"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="27dp" />
+
+    <RadioGroup
+        android:layout_width="103dp"
+        android:layout_height="143dp"
+        tools:layout_editor_absoluteX="47dp"
+        tools:layout_editor_absoluteY="67dp">
+
+        <RadioButton
+            android:id="@+id/nameSelect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Name" />
+
+        <RadioButton
+            android:id="@+id/citySelect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="City" />
+
+        <RadioButton
+            android:id="@+id/birthdaySelect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Birthday" />
+    </RadioGroup>
+
+    <RadioGroup
+        android:layout_width="89dp"
+        android:layout_height="92dp"
+        tools:layout_editor_absoluteX="47dp"
+        tools:layout_editor_absoluteY="258dp">
+
+        <RadioButton
+            android:id="@+id/ascendingSelect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ASC" />
+
+        <RadioButton
+            android:id="@+id/descendingSelect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="DSC" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/orderText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sort Order:"
+        android:textSize="16sp"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="228dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
