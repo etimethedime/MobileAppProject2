@@ -9,7 +9,7 @@
     tools:context=".Chapter4_MyContactsActivity">
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
+        android:id="@+id/navigationBar"
         android:layout_width="409dp"
         android:layout_height="65dp"
         android:background="#4B3083"
