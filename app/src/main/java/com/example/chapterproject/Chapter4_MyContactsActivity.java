@@ -110,5 +110,6 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
         TextView birthDay = findViewById(R.id.birthdayText);
         birthDay.setText(DateFormat.format("MM/dd/yyyy", selectedDate));
     }
+    //can i start
 
 }
