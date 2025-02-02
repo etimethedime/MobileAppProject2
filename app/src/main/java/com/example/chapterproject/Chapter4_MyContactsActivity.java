@@ -76,6 +76,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
             setForEditing(toggleButton.isChecked());
         });
     }
+
     private void setForEditing(boolean enabled) {
        EditText editName = findViewById(R.id.nameText);
        EditText editStreet = findViewById(R.id.streetText);
@@ -86,6 +87,8 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
        EditText editHome = findViewById(R.id.homePhoneText);
        EditText editEmail = findViewById(R.id.emailText);
        EditText editBirthday = findViewById(R.id.birthdayText);
+       Button changeDateButton = findViewById(R.id.changeBirthdayButton);
+       Button saveButton = findViewById(R.id.saveButton);
 
        editName.setEnabled(enabled);
        editStreet.setEnabled(enabled);
@@ -96,6 +99,8 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
        editHome.setEnabled(enabled);
        editEmail.setEnabled(enabled);
        editBirthday.setEnabled(enabled);
+       changeDateButton.setEnabled(enabled);
+       saveButton.setEnabled(enabled);
 
        if (enabled) {
            editName.requestFocus();
@@ -110,6 +115,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
             datePickerDialogue.show(getSupportFragmentManager(), "date picker");
         });
     }
+
 
     @Override
     public void didFinishDatePickerDialog(Calendar selectedDate) {
@@ -132,9 +138,10 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                currentContact.setContactName(s.toString());
             }
         });
+
         final EditText etStreet = findViewById(R.id.streetText);
         etStreet.addTextChangedListener(new TextWatcher() {
             @Override
@@ -149,7 +156,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                currentContact.setStreetAddress(s.toString());
             }
         });
         final EditText etCity = findViewById(R.id.cityText);
@@ -166,7 +173,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                currentContact.setCity(s.toString());
             }
         });
         final EditText etState = findViewById(R.id.stateText);
@@ -183,7 +190,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                currentContact.setState(s.toString());
             }
         });
         final EditText etZipcode = findViewById(R.id.zipcodeText);
@@ -200,7 +207,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                currentContact.setZipCode(s.toString());
             }
         });
         final EditText etCell = findViewById(R.id.cellNumberText);
@@ -255,12 +262,11 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                currentContact.setEmail(s.toString());
             }
         });
         etHome.addTextChangedListener(new PhoneNumberFormattingTextWatcher(){
 
         });
     }
-
 }
