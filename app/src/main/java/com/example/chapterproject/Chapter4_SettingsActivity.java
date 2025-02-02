@@ -2,6 +2,7 @@ package com.example.chapterproject;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -113,4 +114,5 @@ public class Chapter4_SettingsActivity extends AppCompatActivity {
             }
         });
     }
+
 }
