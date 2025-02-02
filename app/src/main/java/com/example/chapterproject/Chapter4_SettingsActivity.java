@@ -1,6 +1,8 @@
 package com.example.chapterproject;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
@@ -25,10 +27,33 @@ public class Chapter4_SettingsActivity extends AppCompatActivity {
         initSettings();
         initSortByClick();
         initSortOrderClick();
+        initContactListButton();
+        initMapButton();
+        initSettingsButton();
 
 
 
     }
+    private void initContactListButton() {
+        ImageButton contactListButton = findViewById(R.id.contactListButton);
+        contactListButton.setOnClickListener(v -> {
+            Intent listIntent = new Intent(Chapter4_SettingsActivity.this, Chapter4_ContactListActivity.class);
+            listIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(listIntent);
+        });
+    }
+    private void initMapButton() {
+        ImageButton mapButton = findViewById(R.id.contactMapButton);
+        mapButton.setOnClickListener(v -> {
+            Intent listIntent = new Intent(Chapter4_SettingsActivity.this, Chapter4_MapActivity.class);
+            listIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(listIntent);
+        });
+    }
+    private void initSettingsButton() {
+        ImageButton settingsButton = findViewById(R.id.contactSettingsButton);
+        settingsButton.setEnabled(false);
+        }
 
     private void initSettings(){
         String sortBy = getSharedPreferences
