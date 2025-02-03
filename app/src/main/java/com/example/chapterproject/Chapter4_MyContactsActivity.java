@@ -43,6 +43,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
         setForEditing(false);
         initChangeDateButton();
         initSaveButton();
+        initTextChangedEvents();
 
     }
 
@@ -73,7 +74,6 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
 
     private void initSaveButton() {
         Button saveButton = findViewById(R.id.saveButton);
-
         saveButton.setOnClickListener(v -> {
             boolean wasSuccessful;
             ContactDataSource ds = new ContactDataSource(Chapter4_MyContactsActivity.this);
@@ -92,6 +92,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
                 setForEditing(false);
             }
         });
+
     }
 
 

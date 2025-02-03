@@ -207,7 +207,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="ToggleButton" />
+                android:text="ToggleButton"
+                android:textOff="ON"
+                android:textOn="OFF" />
 
             <Space
                 android:layout_width="103dp"
