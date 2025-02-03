@@ -42,6 +42,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
         initToggleButton();
         setForEditing(false);
         initChangeDateButton();
+        initSaveButton();
 
     }
 
@@ -72,14 +73,15 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
 
     private void initSaveButton() {
         Button saveButton = findViewById(R.id.saveButton);
+
         saveButton.setOnClickListener(v -> {
-            boolean wasSuccessful = false;
+            boolean wasSuccessful;
             ContactDataSource ds = new ContactDataSource(Chapter4_MyContactsActivity.this);
             ds.open();
             if (currentContact.getId() == -1) {
                 wasSuccessful = ds.insertContact(currentContact);
                 int newId = ds.getLastContactId();
-                currentContact.setContactID(newId);
+                currentContact.setId(newId);
             } else {
                 wasSuccessful = ds.updateContact(currentContact);
             }
@@ -91,6 +93,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
             }
         });
     }
+
 
     private void initToggleButton() {
         ToggleButton toggleButton = findViewById(R.id.onOffButton);
