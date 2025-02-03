@@ -213,41 +213,33 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
         final EditText etCell = findViewById(R.id.cellNumberText);
         etCell.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
             @Override
             public void afterTextChanged(Editable s) {
                 String formattedNumber = PhoneNumberUtils.formatNumber(s.toString(), Locale.getDefault().getCountry());
-                if (!s.toString().equals(formattedNumber)) {
-                    etCell.setText(formattedNumber);
-                    etCell.setSelection(formattedNumber.length());
-                }
+                currentContact.setCellNumber(formattedNumber);
             }
         });
+
         final EditText etHome = findViewById(R.id.homePhoneText);
         etHome.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
             @Override
             public void afterTextChanged(Editable s) {
                 String formattedNumber = PhoneNumberUtils.formatNumber(s.toString(), Locale.getDefault().getCountry());
-                if (!s.toString().equals(formattedNumber)) {
-                    etHome.setText(formattedNumber);
-                    etHome.setSelection(formattedNumber.length());
-                }
+                currentContact.setHomePhoneNumber(formattedNumber);
             }
         });
+
         final EditText etEmail = findViewById(R.id.emailText);
         etEmail.addTextChangedListener(new TextWatcher() {
             @Override
@@ -264,9 +256,6 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
             public void afterTextChanged(Editable s) {
                 currentContact.setEmail(s.toString());
             }
-        });
-        etHome.addTextChangedListener(new PhoneNumberFormattingTextWatcher(){
-
         });
     }
 }

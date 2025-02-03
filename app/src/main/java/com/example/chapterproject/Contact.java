@@ -43,7 +43,7 @@ public class Contact {
         this.zipCode = zipCode;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
+    public void setHomePhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
@@ -84,7 +84,7 @@ public class Contact {
         return zipCode;
     }
 
-    public String getPhoneNumber() {
+    public String getHomePhoneNumber() {
         return phoneNumber;
     }
 

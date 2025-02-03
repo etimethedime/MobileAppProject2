@@ -29,7 +29,7 @@ public class ContactDataSource {
             initialValues.put("city", c.getCity());
             initialValues.put("state", c.getState());
             initialValues.put("zipcode", c.getZipCode());
-            initialValues.put("phonenumber", c.getPhoneNumber());
+            initialValues.put("phonenumber", c.getHomePhoneNumber());
             initialValues.put("cellnumber", c.getCellNumber());
             initialValues.put("email", c.getEmail());
             initialValues.put("birthday", c.getBirthday());
@@ -51,7 +51,7 @@ public class ContactDataSource {
                 updateValues.put("city", c.getCity());
                 updateValues.put("state", c.getState());
                 updateValues.put("zipcode", c.getZipCode());
-                updateValues.put("phonenumber", c.getPhoneNumber());
+                updateValues.put("phonenumber", c.getHomePhoneNumber());
                 updateValues.put("cellnumber", c.getCellNumber());
                 updateValues.put("email", c.getEmail());
                 updateValues.put("birthday", c.getBirthday());
