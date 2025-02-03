@@ -70,6 +70,28 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
         });
     }
 
+    private void initSaveButton() {
+        Button saveButton = findViewById(R.id.saveButton);
+        saveButton.setOnClickListener(v -> {
+            boolean wasSuccessful = false;
+            ContactDataSource ds = new ContactDataSource(Chapter4_MyContactsActivity.this);
+            ds.open();
+            if (currentContact.getId() == -1) {
+                wasSuccessful = ds.insertContact(currentContact);
+                int newId = ds.getLastContactId();
+                currentContact.setContactID(newId);
+            } else {
+                wasSuccessful = ds.updateContact(currentContact);
+            }
+            ds.close();
+            if (wasSuccessful) {
+                ToggleButton toggleButton = findViewById(R.id.onOffButton);
+                toggleButton.toggle();
+                setForEditing(false);
+            }
+        });
+    }
+
     private void initToggleButton() {
         ToggleButton toggleButton = findViewById(R.id.onOffButton);
         toggleButton.setOnClickListener(v -> {
