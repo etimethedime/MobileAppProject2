@@ -15,7 +15,7 @@ public class Contact {
     private String birthday;
 
     public Contact() {
-        id=-1;
+        id=1;
         birthday = String.valueOf(Calendar.getInstance());
     }
 
