@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 public class ContactDataSource {
     private SQLiteDatabase database;
@@ -22,7 +23,7 @@ public class ContactDataSource {
     }
 
     public boolean insertContact(Contact c) {
-        boolean didSuceed = false;
+        boolean didSucceed = false;
         try {
             ContentValues initialValues = new ContentValues();
             initialValues.put("contactname", c.getContactName());
@@ -34,47 +35,60 @@ public class ContactDataSource {
             initialValues.put("cellnumber", c.getCellNumber());
             initialValues.put("email", c.getEmail());
             initialValues.put("birthday", c.getBirthday());
-            didSuceed = database.insert("contact", null, initialValues) >0;
 
+            long result = database.insert("contact", null, initialValues);
+
+            if (result > 0) {
+                didSucceed = true;
+            } else {
+                Log.e("ContactDataSource", "Error inserting contact into database");
+            }
         } catch (Exception e) {
+            Log.e("ContactDataSource", "Error during contact insertion", e);
+        }
+        return didSucceed;
+    }
 
+
+    public boolean updateContact(Contact c) {
+        boolean didSuceed = false;
+        try {
+            Long rowId = c.getId();
+            ContentValues updateValues = new ContentValues();
+            updateValues.put("contactname", c.getContactName());
+            updateValues.put("streetaddress", c.getStreetAddress());
+            updateValues.put("city", c.getCity());
+            updateValues.put("state", c.getState());
+            updateValues.put("zipcode", c.getZipCode());
+            updateValues.put("phonenumber", c.getHomePhoneNumber());
+            updateValues.put("cellnumber", c.getCellNumber());
+            updateValues.put("email", c.getEmail());
+            updateValues.put("birthday", c.getBirthday());
+            didSuceed = database.update("contact", updateValues, "_id=" + rowId, null) > 0;
+        } catch (Exception e) {
         }
         return didSuceed;
-        }
+    }
+    public int getLastContactId() {
+        int lastId = -1;
+        Cursor cursor = null;
+        try {
+            String query = "SELECT MAX(_id) FROM contact";
+            cursor = database.rawQuery(query, null);
 
-        public boolean updateContact(Contact c) {
-            boolean didSuceed = false;
-            try {
-                Long rowId = (long) c.getId();
-                ContentValues updateValues = new ContentValues();
-                updateValues.put("contactname", c.getContactName());
-                updateValues.put("streetaddress", c.getStreetAddress());
-                updateValues.put("city", c.getCity());
-                updateValues.put("state", c.getState());
-                updateValues.put("zipcode", c.getZipCode());
-                updateValues.put("phonenumber", c.getHomePhoneNumber());
-                updateValues.put("cellnumber", c.getCellNumber());
-                updateValues.put("email", c.getEmail());
-                updateValues.put("birthday", c.getBirthday());
-                didSuceed = database.update("contact", updateValues, "_id=" + rowId, null) > 0;
-            } catch (Exception e) {
-
-            }
-            return didSuceed;
-        }
-        public int getLastContactId() {
-            int lastId;
-            try {
-                String query = "Select MAX(_id) from contact";
-                Cursor cursor = database.rawQuery(query, null);
-                cursor.moveToFirst();
+            if (cursor != null && cursor.moveToFirst()) {
                 lastId = cursor.getInt(0);
-                cursor.close();
-            } catch (Exception e) {
-                lastId = -1;
             }
-            return lastId;
-
+        } catch (Exception e) {
+            Log.e("ContactDataSource", "Error getting last contact ID", e);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
+        return lastId;
+    }
+
+
 
 }

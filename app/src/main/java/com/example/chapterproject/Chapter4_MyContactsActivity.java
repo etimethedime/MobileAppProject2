@@ -6,6 +6,7 @@ import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.telephony.PhoneNumberUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -75,25 +76,43 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
     private void initSaveButton() {
         Button saveButton = findViewById(R.id.saveButton);
         saveButton.setOnClickListener(v -> {
+
+            Log.d("SaveContact", "Name: " + currentContact.getContactName() +
+                    ", Phone: " + currentContact.getCellNumber() +
+                    ", Email: " + currentContact.getEmail());
+
             boolean wasSuccessful;
             ContactDataSource ds = new ContactDataSource(Chapter4_MyContactsActivity.this);
             ds.open();
+
             if (currentContact.getId() == -1) {
                 wasSuccessful = ds.insertContact(currentContact);
-                int newId = ds.getLastContactId();
-                currentContact.setId(newId);
+                if (wasSuccessful) {
+                    int newId = ds.getLastContactId();
+                    currentContact.setId(newId);
+                    Log.d("SaveContact", "Contact inserted successfully with ID: " + newId);
+                } else {
+                    Log.d("SaveContact", "Contact insertion failed.");
+                }
             } else {
                 wasSuccessful = ds.updateContact(currentContact);
+                if (wasSuccessful) {
+                    Log.d("SaveContact", "Contact updated successfully.");
+                } else {
+                    Log.d("SaveContact", "Contact update failed.");
+                }
             }
+
             ds.close();
+
             if (wasSuccessful) {
                 ToggleButton toggleButton = findViewById(R.id.onOffButton);
                 toggleButton.toggle();
                 setForEditing(false);
             }
         });
-
     }
+
 
 
     private void initToggleButton() {
