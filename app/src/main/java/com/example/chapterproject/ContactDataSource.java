@@ -49,9 +49,8 @@ public class ContactDataSource {
         return didSucceed;
     }
 
-
     public boolean updateContact(Contact c) {
-        boolean didSuceed = false;
+        boolean didSucceed = false;
         try {
             Long rowId = c.getId();
             ContentValues updateValues = new ContentValues();
@@ -64,11 +63,21 @@ public class ContactDataSource {
             updateValues.put("cellnumber", c.getCellNumber());
             updateValues.put("email", c.getEmail());
             updateValues.put("birthday", c.getBirthday());
-            didSuceed = database.update("contact", updateValues, "_id=" + rowId, null) > 0;
+
+            int rowsUpdated = database.update("contact", updateValues, "_id=" + rowId, null);
+
+            if (rowsUpdated > 0) {
+                didSucceed = true;
+                Log.d("ContactDataSource", "Contact updated successfully, ID: " + rowId);
+            } else {
+                Log.e("ContactDataSource", "Error updating contact with ID: " + rowId);
+            }
         } catch (Exception e) {
+            Log.e("ContactDataSource", "Error during contact update", e);
         }
-        return didSuceed;
+        return didSucceed;
     }
+
     public int getLastContactId() {
         int lastId = -1;
         Cursor cursor = null;
