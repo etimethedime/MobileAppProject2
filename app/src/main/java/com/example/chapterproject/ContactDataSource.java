@@ -54,7 +54,7 @@ public class ContactDataSource {
     public boolean updateContact(Contact c) {
         boolean didSucceed = false;
         try {
-            Long rowId = c.getId();
+            long rowId = c.getId();
             ContentValues updateValues = new ContentValues();
             updateValues.put("contactname", c.getContactName());
             updateValues.put("streetaddress", c.getStreetAddress());
@@ -149,7 +149,7 @@ public class ContactDataSource {
         return contacts;
     }
 
-    public Contact getSpecificContact(int contactId) {
+    public Contact getSpecificContact(long contactId) {
         Contact contact = new Contact();
         String query = "SELECT * FROM contact WHERE _id = " + contactId;
         Cursor cursor = database.rawQuery(query, null);

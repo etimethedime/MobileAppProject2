@@ -41,7 +41,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
         initToggleButton();
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
-            initContact(extras.getInt("contactId"));
+            initContact(extras.getLong("contactId"));
         }
         else{
             currentContact = new Contact();
@@ -133,7 +133,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
             datePickerDialogue.show(getSupportFragmentManager(), "date picker");
         });
     }
-    private void initContact(int id) {
+    private void initContact(long id) {
         ContactDataSource ds = new ContactDataSource(Chapter4_MyContactsActivity.this);
         try {
             ds.open();

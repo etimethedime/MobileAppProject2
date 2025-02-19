@@ -25,7 +25,7 @@ public class Chapter4_ContactListActivity extends AppCompatActivity {
             int position = viewHolder.getAdapterPosition();
             long contactID = contacts.get(position).getId();
             Intent intent = new Intent(Chapter4_ContactListActivity.this, Chapter4_MyContactsActivity.class);
-            intent.putExtra("contactId", (int) contactID);
+            intent.putExtra("contactId", contactID);
             startActivity(intent);
         };
 
@@ -44,7 +44,6 @@ public class Chapter4_ContactListActivity extends AppCompatActivity {
         initSettingsButton();
 
         ContactDataSource ds = new ContactDataSource(Chapter4_ContactListActivity.this);
-        ArrayList<Contact> contacts;
 
         try {
             ds.open();
@@ -55,7 +54,7 @@ public class Chapter4_ContactListActivity extends AppCompatActivity {
             contactList.setLayoutManager(layoutManager);
             ContactAdapter adapter = new ContactAdapter(contacts);
             contactList.setAdapter(adapter);
-            //ContactAdapter.setOnItemClickListener(onItemClickListener);
+            ContactAdapter.setOnItemClickListener(onItemClickListener);
         }
         catch (Exception e) {
             Toast.makeText(this, "Error retrieving contacts", Toast.LENGTH_SHORT).show();
