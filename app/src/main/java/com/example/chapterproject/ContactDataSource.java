@@ -119,6 +119,57 @@ public class ContactDataSource {
         return contactNames;
     }
 
+    public ArrayList<Contact> getContacts(){
+        ArrayList<Contact> contacts = new ArrayList<>();
+        try{
+            String query = "SELECT * FROM contact";
+            Cursor cursor = database.rawQuery(query, null);
+
+            Contact newContact;
+            cursor.moveToFirst();
+            while(!cursor.isAfterLast()){
+                newContact = new Contact();
+                newContact.setId(cursor.getInt(0));
+                newContact.setContactName(cursor.getString(1));
+                newContact.setStreetAddress(cursor.getString(2));
+                newContact.setCity(cursor.getString(3));
+                newContact.setState(cursor.getString(4));
+                newContact.setZipCode(cursor.getString(5));
+                newContact.setHomePhoneNumber(cursor.getString(6));
+                newContact.setCellNumber(cursor.getString(7));
+                newContact.setEmail(cursor.getString(8));
+                newContact.setBirthday(cursor.getString(9));
+                contacts.add(newContact);
+                cursor.moveToNext();
+        }
+            cursor.close();
+        }catch(Exception e){
+            Log.e("ContactDataSource", "Error getting contacts", e);
+        }
+        return contacts;
+    }
+
+    public Contact getSpecificContact(int contactId) {
+        Contact contact = new Contact();
+        String query = "SELECT * FROM contact WHERE _id = " + contactId;
+        Cursor cursor = database.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            contact.setId(cursor.getInt(0));
+            contact.setContactName(cursor.getString(1));
+            contact.setStreetAddress(cursor.getString(2));
+            contact.setCity(cursor.getString(3));
+            contact.setState(cursor.getString(4));
+            contact.setZipCode(cursor.getString(5));
+            contact.setHomePhoneNumber(cursor.getString(6));
+            contact.setCellNumber(cursor.getString(7));
+            contact.setEmail(cursor.getString(8));
+            contact.setBirthday(cursor.getString(9));
+            cursor.close();
+        }
+        return contact;
+    }
+
+
 
 
 }

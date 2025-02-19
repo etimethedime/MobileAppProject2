@@ -2,7 +2,6 @@ package com.example.chapterproject;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.telephony.PhoneNumberUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -35,12 +34,18 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        currentContact = new Contact();
 
         initContactListButton();
         initMapButton();
         initSettingsButton();
         initToggleButton();
+        Bundle extras = getIntent().getExtras();
+        if(extras != null) {
+            initContact(extras.getInt("contactId"));
+        }
+        else{
+            currentContact = new Contact();
+        }
         setForEditing(false);
         initChangeDateButton();
         initSaveButton();
@@ -121,6 +126,43 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
             setForEditing(toggleButton.isChecked());
         });
     }
+    private void initChangeDateButton() {
+        Button changeDateButton = findViewById(R.id.changeBirthdayButton);
+        changeDateButton.setOnClickListener(v -> {
+            DatePickerDialogue datePickerDialogue = new DatePickerDialogue();
+            datePickerDialogue.show(getSupportFragmentManager(), "date picker");
+        });
+    }
+    private void initContact(int id) {
+        ContactDataSource ds = new ContactDataSource(Chapter4_MyContactsActivity.this);
+        try {
+            ds.open();
+            currentContact = ds.getSpecificContact(id);
+            ds.close();
+        } catch (Exception e) {
+            Log.w(this.getLocalClassName(), "Error getting contact");
+        }
+        EditText editName = findViewById(R.id.nameText);
+        EditText editStreet = findViewById(R.id.streetText);
+        EditText editCity = findViewById(R.id.cityText);
+        EditText editState = findViewById(R.id.stateText);
+        EditText editZipcode = findViewById(R.id.zipcodeText);
+        EditText editCell = findViewById(R.id.cellNumberText);
+        EditText editHome = findViewById(R.id.homePhoneText);
+        EditText editEmail = findViewById(R.id.emailText);
+        EditText editBirthday = findViewById(R.id.birthdayText);
+
+        editName.setText(currentContact.getContactName());
+        editStreet.setText(currentContact.getStreetAddress());
+        editCity.setText(currentContact.getCity());
+        editState.setText(currentContact.getState());
+        editZipcode.setText(currentContact.getZipCode());
+        editCell.setText(currentContact.getCellNumber());
+        editHome.setText(currentContact.getHomePhoneNumber());
+        editEmail.setText(currentContact.getEmail());
+        editBirthday.setText(currentContact.getBirthday());
+    }
+
 
     private void setForEditing(boolean enabled) {
        EditText editName = findViewById(R.id.nameText);
@@ -153,13 +195,6 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
 
     }
 
-    private void initChangeDateButton() {
-        Button changeDateButton = findViewById(R.id.changeBirthdayButton);
-        changeDateButton.setOnClickListener(v -> {
-            DatePickerDialogue datePickerDialogue = new DatePickerDialogue();
-            datePickerDialogue.show(getSupportFragmentManager(), "date picker");
-        });
-    }
 
 
     @Override

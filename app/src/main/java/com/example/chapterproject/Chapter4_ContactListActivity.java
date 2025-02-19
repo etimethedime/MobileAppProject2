@@ -2,6 +2,7 @@ package com.example.chapterproject;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -16,6 +17,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 public class Chapter4_ContactListActivity extends AppCompatActivity {
+
+    ArrayList<Contact> contacts;
+
+    private View.OnClickListener onItemClickListener = view -> {
+            RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder) view.getTag();
+            int position = viewHolder.getAdapterPosition();
+            long contactID = contacts.get(position).getId();
+            Intent intent = new Intent(Chapter4_ContactListActivity.this, Chapter4_MyContactsActivity.class);
+            intent.putExtra("contactId", (int) contactID);
+            startActivity(intent);
+        };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,17 +44,18 @@ public class Chapter4_ContactListActivity extends AppCompatActivity {
         initSettingsButton();
 
         ContactDataSource ds = new ContactDataSource(Chapter4_ContactListActivity.this);
-        ArrayList<String> names;
+        ArrayList<Contact> contacts;
 
         try {
             ds.open();
-            names = ds.getContactNames();
+            contacts = ds.getContacts();
             ds.close();
             RecyclerView contactList = findViewById(R.id.contactRV);
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
             contactList.setLayoutManager(layoutManager);
-            ContactAdapter adapter = new ContactAdapter(names);
+            ContactAdapter adapter = new ContactAdapter(contacts);
             contactList.setAdapter(adapter);
+            //ContactAdapter.setOnItemClickListener(onItemClickListener);
         }
         catch (Exception e) {
             Toast.makeText(this, "Error retrieving contacts", Toast.LENGTH_SHORT).show();
@@ -50,8 +63,8 @@ public class Chapter4_ContactListActivity extends AppCompatActivity {
 
     }
     private void initContactListButton() {
-        ImageButton settingsButton = findViewById(R.id.contactSettingsButton);
-        settingsButton.setEnabled(false);
+        ImageButton contactListButton = findViewById(R.id.contactListButton);
+        contactListButton.setEnabled(false);
     }
     private void initMapButton() {
         ImageButton mapButton = findViewById(R.id.contactMapButton);
@@ -69,5 +82,6 @@ public class Chapter4_ContactListActivity extends AppCompatActivity {
             startActivity(listIntent);
         });
     }
+
 
 }
