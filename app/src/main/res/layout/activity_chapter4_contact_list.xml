@@ -52,6 +52,7 @@
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/contactRV"
         android:layout_width="409dp"
         android:layout_height="662dp"
         app:layout_constraintBottom_toBottomOf="parent"
