@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import java.util.ArrayList;
+
 public class ContactDataSource {
     private SQLiteDatabase database;
     private ContactListDBHelper dbHelper;
@@ -96,6 +98,25 @@ public class ContactDataSource {
             }
         }
         return lastId;
+    }
+
+    public ArrayList<String> getContactNames() {
+        ArrayList<String> contactNames = new ArrayList<>();
+        Cursor cursor = null;
+        try {
+            String query = "SELECT contactname FROM contact";
+            cursor = database.rawQuery(query, null);
+            while (cursor.moveToNext()) {
+                contactNames.add(cursor.getString(0));
+            }
+        } catch (Exception e) {
+            Log.e("ContactDataSource", "Error getting contact names", e);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return contactNames;
     }
 
 
