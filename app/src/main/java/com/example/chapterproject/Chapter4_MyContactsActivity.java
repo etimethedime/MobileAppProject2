@@ -79,7 +79,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
     }
 
     private void initSaveButton() {
-        Button saveButton = findViewById(R.id.saveButton);
+        Button saveButton = findViewById(R.id.buttonAddContact);
         saveButton.setOnClickListener(v -> {
 
             Log.d("SaveContact", "Name: " + currentContact.getContactName() +
@@ -175,7 +175,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
        EditText editEmail = findViewById(R.id.emailText);
        EditText editBirthday = findViewById(R.id.birthdayText);
        Button changeDateButton = findViewById(R.id.changeBirthdayButton);
-       Button saveButton = findViewById(R.id.saveButton);
+       Button saveButton = findViewById(R.id.buttonAddContact);
 
        editName.setEnabled(enabled);
        editStreet.setEnabled(enabled);

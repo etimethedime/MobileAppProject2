@@ -168,8 +168,17 @@ public class ContactDataSource {
         }
         return contact;
     }
-
+    public boolean deleteContact(long contactId) {
+        boolean didDelete = false;
+        try {
+            didDelete = database.delete("contact", "_id = " + contactId, null) > 0;
+        } catch (Exception e) {
+            Log.e("ContactDataSource", "Error deleting contact", e);
+        }
+        return didDelete;
+    }
 
 
 
 }
+
