@@ -1,8 +1,11 @@
 package com.example.chapterproject;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 public class Contact {
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
     private long id;
     private String contactName;
     private String streetAddress;
@@ -12,12 +15,13 @@ public class Contact {
     private String phoneNumber;
     private String cellNumber;
     private String email;
-    private String birthday;
+    private Calendar birthday;
 
     public Contact() {
-        id=1;
-        birthday = String.valueOf(Calendar.getInstance());
+        id = -1;
+        birthday = Calendar.getInstance();
     }
+
 
     public void setId(long id) {
         this.id = id;
@@ -55,8 +59,14 @@ public class Contact {
         this.email = email;
     }
 
-    public void setBirthday(String birthday) {
-        this.birthday = birthday;
+    public void setBirthday(String birthdayStr) {
+        try {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(dateFormat.parse(birthdayStr));
+            this.birthday = cal;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -97,6 +107,6 @@ public class Contact {
     }
 
     public String getBirthday() {
-        return birthday;
+        return dateFormat.format(birthday.getTime());
     }
 }

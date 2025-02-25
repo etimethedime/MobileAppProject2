@@ -21,12 +21,14 @@ public class ContactAdapter extends RecyclerView.Adapter {
     public class ContactViewHolder extends RecyclerView.ViewHolder {
         public TextView tvContactName;
         public TextView tvPhone;
+        public TextView tvEmail;
         public Button deleteContactButton;
 
         public ContactViewHolder(@NonNull View itemView) {
             super(itemView);
             tvContactName = itemView.findViewById(R.id.contactNameText);
             tvPhone = itemView.findViewById(R.id.contactPhoneText);
+            tvEmail = itemView.findViewById(R.id.contactEmailText);
             deleteContactButton = itemView.findViewById(R.id.deleteButton);
             itemView.setTag(this);
             itemView.setOnClickListener(mOnItemClickListener);
@@ -55,6 +57,7 @@ public class ContactAdapter extends RecyclerView.Adapter {
         ContactViewHolder viewHolder = (ContactViewHolder) holder;
         viewHolder.tvContactName.setText(contactData.get(position).getContactName());
         viewHolder.tvPhone.setText(contactData.get(position).getCellNumber());
+        viewHolder.tvEmail.setText(contactData.get(position).getEmail());
 
         if (isDeleting) {
             viewHolder.deleteContactButton.setVisibility(View.VISIBLE);
@@ -68,7 +71,7 @@ public class ContactAdapter extends RecyclerView.Adapter {
                 }
             });
         } else {
-            viewHolder.deleteContactButton.setVisibility(View.GONE);
+            viewHolder.deleteContactButton.setVisibility(View.INVISIBLE);
         }
     }
 

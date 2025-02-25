@@ -23,6 +23,7 @@ public class Chapter4_ContactListActivity extends AppCompatActivity {
 
     ArrayList<Contact> contacts;
     ContactAdapter contactAdapter;
+    RecyclerView contactList;
 
     private View.OnClickListener onItemClickListener = view -> {
         RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder) view.getTag();
@@ -50,12 +51,14 @@ public class Chapter4_ContactListActivity extends AppCompatActivity {
         initDeleteSwitch();
 
         ContactDataSource ds = new ContactDataSource(Chapter4_ContactListActivity.this);
+        String sortField = getSharedPreferences("MyContactListPreferences", MODE_PRIVATE).getString("sortfield", "contactname");
+        String sortOrder = getSharedPreferences("MyContactListPreferences", MODE_PRIVATE).getString("sortorder", "ASC");
 
         try {
             ds.open();
-            contacts = ds.getContacts();
+            contacts = ds.getContacts(sortField, sortOrder);
             ds.close();
-            RecyclerView contactList = findViewById(R.id.contactRV);
+            contactList = findViewById(R.id.contactRV);
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
             contactList.setLayoutManager(layoutManager);
 
@@ -68,6 +71,22 @@ public class Chapter4_ContactListActivity extends AppCompatActivity {
             Toast.makeText(this, "Error retrieving contacts", Toast.LENGTH_SHORT).show();
         }
 
+    }
+    @Override
+    public void onResume(){
+        super.onResume();
+        String sortBy = getSharedPreferences("MyContactListPreferences", MODE_PRIVATE).getString("sortfield", "contactname");
+        String sortOrder = getSharedPreferences("MyContactListPreferences", MODE_PRIVATE).getString("sortorder", "ASC");
+        ContactDataSource ds = new ContactDataSource(Chapter4_ContactListActivity.this);
+        try{
+            ds.open();
+            contacts = ds.getContacts(sortBy, sortOrder);
+            ds.close();
+            contactList.setAdapter(contactAdapter);
+            contactAdapter.notifyDataSetChanged();
+        }catch(Exception e){
+            Toast.makeText(this, "Error retrieving contacts", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void initContactListButton() {
