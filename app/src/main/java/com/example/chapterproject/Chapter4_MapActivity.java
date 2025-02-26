@@ -1,31 +1,36 @@
 package com.example.chapterproject;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
-import java.io.IOException;
 import java.util.List;
 
 public class Chapter4_MapActivity extends AppCompatActivity {
 
     LocationManager locationManager;
     LocationListener gpsListener;
+    final int PERMISSION_REQUEST_CODE = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,11 +45,18 @@ public class Chapter4_MapActivity extends AppCompatActivity {
         initContactListButton();
         initMapButton();
         initSettingsButton();
+        initGetLocationButton();
+
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        if(Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission( getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED){
+            return;
+        }
         try{
             locationManager.removeUpdates(gpsListener);
         } catch (SecurityException e) {
@@ -77,57 +89,94 @@ public class Chapter4_MapActivity extends AppCompatActivity {
     private void initGetLocationButton() {
         Button locationButton = findViewById(R.id.buttonLocate);
         locationButton.setOnClickListener(v -> {
-            EditText streetText = findViewById(R.id.mapStreetText);
-            EditText cityText = findViewById(R.id.mapCityText);
-            EditText stateText = findViewById(R.id.mapStateText);
-            EditText zipText = findViewById(R.id.mapZipText);
+            try{
+            if(Build.VERSION.SDK_INT >=23){
+                if(ContextCompat.checkSelfPermission(Chapter4_MapActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)!=
+                PackageManager.PERMISSION_GRANTED){
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(Chapter4_MapActivity.this,
+                            android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+                        Snackbar.make(findViewById(R.id.main), "Location permission is needed to display location", Snackbar.LENGTH_INDEFINITE)
+                                .setAction("OK", v1 -> ActivityCompat.requestPermissions(Chapter4_MapActivity.this, new String[]
+                                        {android.Manifest.permission.ACCESS_FINE_LOCATION}, 1)).show();
 
-            String address = streetText.getText().toString() + " " +
-                    cityText.getText().toString() + " " +
-                    stateText.getText().toString() + " " +
-                    zipText.getText().toString();
-
-            List<Address> addresses = null;
-            Geocoder geo = new Geocoder(Chapter4_MapActivity.this);
-            try {
-                locationManager = (LocationManager) getBaseContext().getSystemService(LOCATION_SERVICE);
-
-                gpsListener = new LocationListener() {
-                    @Override
-                    public void onLocationChanged(android.location.Location location) {
-                        TextView latitudeText = findViewById(R.id.latitudeText);
-                        TextView longitudeText = findViewById(R.id.longitudeText);
-                        TextView accuracyText = findViewById(R.id.accuracyText);
-
-                        latitudeText.setText("Latitude: " + location.getLatitude());
-                        longitudeText.setText("Longitude: " + location.getLongitude());
-                        accuracyText.setText("Accuracy: " + location.getAccuracy() + " meters");
                     }
-
-                    @Override
-                    public void onStatusChanged(String provider, int status, Bundle extras) {}
-                    @Override
-                    public void onProviderEnabled(String provider) {}
-                    @Override
-                    public void onProviderDisabled(String provider) {}
-                };
-            } catch (Exception e) {
+                    else{
+                        ActivityCompat.requestPermissions(Chapter4_MapActivity.this, new String[]
+                                {android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                    }
+                }
+                    else{
+                        startLocationUpdates();
+                    }
+                }else{
+                    startLocationUpdates();
+            }}
+            catch (Exception e){
+                Log.d("MapActivity", "Error", e);
                 Toast.makeText(getBaseContext(), "Error. Location not available", Toast.LENGTH_LONG).show();
             }
-
-            TextView latitudeText = findViewById(R.id.latitudeText);
-            TextView longitudeText = findViewById(R.id.longitudeText);
-            TextView accuracyText = findViewById(R.id.accuracyText);
-
-            if (addresses != null && !addresses.isEmpty()) {
-                Address location = addresses.get(0);
-                latitudeText.setText("Latitude: " + location.getLatitude());
-                longitudeText.setText("Longitude: " + location.getLongitude());
-            } else {
-                latitudeText.setText("Latitude: Not Found");
-                longitudeText.setText("Longitude: Not Found");
-            }
         });
+
+    }
+    private void startLocationUpdates(){
+        if(Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) !=
+        PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission( getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION) !=
+        PackageManager.PERMISSION_GRANTED){
+            return;
+        }
+        EditText streetText = findViewById(R.id.mapStreetText);
+        EditText cityText = findViewById(R.id.mapCityText);
+        EditText stateText = findViewById(R.id.mapStateText);
+        EditText zipText = findViewById(R.id.mapZipText);
+
+        String address = streetText.getText().toString() + " " +
+                cityText.getText().toString() + " " +
+                stateText.getText().toString() + " " +
+                zipText.getText().toString();
+
+        List<Address> addresses = null;
+        Geocoder geo = new Geocoder(Chapter4_MapActivity.this);
+        try {
+            locationManager = (LocationManager) getBaseContext().getSystemService(LOCATION_SERVICE);
+
+            gpsListener = new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    TextView latitudeText = findViewById(R.id.latitudeText);
+                    TextView longitudeText = findViewById(R.id.longitudeText);
+                    TextView accuracyText = findViewById(R.id.accuracyText);
+                    latitudeText.setText(""+ location.getLatitude());
+                    longitudeText.setText("" + location.getLongitude());
+                    accuracyText.setText("" + location.getAccuracy() + " meters");
+                }
+
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {}
+                @Override
+                public void onProviderEnabled(String provider) {}
+                @Override
+                public void onProviderDisabled(String provider) {}
+            };
+        } catch (Exception e) {
+            Toast.makeText(getBaseContext(), "Error. Location not available", Toast.LENGTH_LONG).show();
+        }
+
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsListener);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults){
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case PERMISSION_REQUEST_CODE:{
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    startLocationUpdates();
+                }
+                else{
+                    Toast.makeText(getBaseContext(), "Location permission denied", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
     }
 
 
