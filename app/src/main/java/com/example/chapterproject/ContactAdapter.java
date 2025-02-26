@@ -29,7 +29,7 @@ public class ContactAdapter extends RecyclerView.Adapter {
             tvContactName = itemView.findViewById(R.id.contactNameText);
             tvPhone = itemView.findViewById(R.id.contactPhoneText);
             tvEmail = itemView.findViewById(R.id.contactEmailText);
-            deleteContactButton = itemView.findViewById(R.id.deleteButton);
+            deleteContactButton = itemView.findViewById(R.id.buttonLocate);
             itemView.setTag(this);
             itemView.setOnClickListener(mOnItemClickListener);
         }
