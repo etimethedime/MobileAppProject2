@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 import androidx.activity.EdgeToEdge;
 import android.text.format.DateFormat;
@@ -65,6 +66,12 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
         ImageButton mapButton = findViewById(R.id.contactMapButton);
         mapButton.setOnClickListener(v -> {
             Intent listIntent = new Intent(Chapter4_MyContactsActivity.this, Chapter4_MapActivity.class);
+            if(currentContact.getId() == -1) {
+                Toast.makeText(this, "Contact must be saved before displaying location", Toast.LENGTH_LONG).show();
+            }
+            else{
+                listIntent.putExtra("contactId", currentContact.getId());
+            }
             listIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(listIntent);
         });
