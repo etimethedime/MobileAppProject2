@@ -3,6 +3,9 @@ package com.example.chapterproject;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,19 +16,28 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Chapter4_MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -34,13 +46,28 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationRequest locationRequest;
     LocationCallback locationCallback;
+    ArrayList<Contact> contacts = new ArrayList<>();
+    Contact currentContact = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_chapter4_map);
-
+        Bundle extras = getIntent().getExtras();
+        try{
+            ContactDataSource ds = new ContactDataSource(this);
+            ds.open();
+            if(extras != null){
+                currentContact = ds.getSpecificContact(extras.getInt("contactid"));
+            }
+            else{
+                contacts = ds.getContacts("CONTACTNAME", "ASC");
+            }
+            ds.close();
+        } catch (Exception e) {
+            Toast.makeText(this, "Contact's not found", Toast.LENGTH_LONG).show();
+        }
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapFragment);
         mapFragment.getMapAsync(this);
@@ -74,6 +101,60 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
     public void onMapReady(@NonNull GoogleMap googleMap) {
         gMap = googleMap;
         gMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        Point size = new Point();
+        WindowManager windowManager = getWindowManager();
+        windowManager.getDefaultDisplay().getSize(size);
+        int measuredWidth = size.x;
+        int measuredHeight = size.y;
+        if(contacts.size()>0){
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            for (int i=0; i<contacts.size(); i++){
+                currentContact = contacts.get(i);
+
+                Geocoder geocoder = new Geocoder(this);
+                List<Address> addresses = null;
+                String address = currentContact.getStreetAddress() + ", " +
+                        currentContact.getCity() + ", " + currentContact.getState() + " "
+                        + currentContact.getZipCode();
+
+                try{
+                    addresses = geocoder.getFromLocationName(address, 1);
+                }catch (Exception e){
+                    Log.d("MapActivity", "Error", e);
+                }
+                LatLng point = new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
+                builder.include(point);
+                gMap.addMarker(new MarkerOptions().position(point).title(currentContact.getContactName()));
+            }
+            gMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), measuredWidth, measuredHeight, 30));
+        }
+        else{
+            if(currentContact != null){
+                Geocoder geocoder = new Geocoder(this);
+                List<Address> addresses = null;
+                String address = currentContact.getStreetAddress() + ", " +
+                        currentContact.getCity() + ", " + currentContact.getState() + " "
+                        + currentContact.getZipCode();
+                try{
+                    addresses = geocoder.getFromLocationName(address, 1);
+                }catch (Exception e){
+                    Log.d("MapActivity", "Error", e);
+                }
+                LatLng point = new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
+                gMap.addMarker(new MarkerOptions().position(point).title(currentContact.getContactName()).snippet(address));
+                gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 16));
+            }
+            else{
+                AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+                alertDialog.setTitle("No Data");
+                alertDialog.setMessage("No data is available for the mapping function");
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                        (dialog, which) -> dialog.dismiss());
+                alertDialog.show();
+            }
+
+        }
+
         try {
             if (Build.VERSION.SDK_INT >= 23) {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -156,6 +237,7 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
         }
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
     }
+
 
 
 }
