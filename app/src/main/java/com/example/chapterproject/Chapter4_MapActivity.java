@@ -31,6 +31,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.core.app.ActivityCompat;
@@ -48,9 +50,11 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
     LocationCallback locationCallback;
     ArrayList<Contact> contacts = new ArrayList<>();
     Contact currentContact = null;
+    RadioButton rbNormal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_chapter4_map);
@@ -71,13 +75,15 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapFragment);
         mapFragment.getMapAsync(this);
-
+        rbNormal = findViewById(R.id.radioButtonNormal);
+        rbNormal.setChecked(true);
         createLocationRequest();
         createLocationCallback();
 
         initContactListButton();
         initMapButton();
         initSettingsButton();
+        initMapTypeButtons();
     }
 
     @Override
@@ -100,7 +106,7 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         gMap = googleMap;
-        gMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        gMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         Point size = new Point();
         WindowManager windowManager = getWindowManager();
         windowManager.getDefaultDisplay().getSize(size);
@@ -175,6 +181,22 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
             Toast.makeText(this, "Error. Location not available", Toast.LENGTH_LONG).show();
         }
     }
+
+    private void initMapTypeButtons(){
+        RadioGroup rgMapType = findViewById(R.id.radioGroupMapType);
+        RadioButton rbSatellite = findViewById(R.id.radioButtonSatellite);
+        RadioButton rbNormal = findViewById(R.id.radioButtonNormal);
+
+        rgMapType.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == rbNormal.getId()) {
+                gMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            } else if (checkedId == rbSatellite.getId()) {
+                gMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+            }
+        });
+    }
+
+
 
     private void createLocationRequest() {
         locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
