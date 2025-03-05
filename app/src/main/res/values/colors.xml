@@ -4,4 +4,9 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#D31D1D1D</color>
     <color name="buttonColor">#D31D1D1D</color>
+    <color name="satelliteMapTextColor">#FFFFFFFF</color>
+    <color name="normalMapTextColor">#000000</color>
+    <color name="satelliteRadioButtonColor">#FFFFFF</color>
+    <color name="normalRadioButtonColor">#000000</color>
+
 </resources>

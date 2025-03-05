@@ -58,14 +58,31 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <Space
-                android:layout_width="118dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/batteryLevelTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_weight="1"
+                android:text="100%"
+                android:textColor="#DED8D8" />
+
+            <Space
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1" />
 
             <Button
                 android:id="@+id/buttonAddContact"
-                android:layout_width="133dp"
-                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:backgroundTint="#7FA4E0"
                 android:text="NEW"
@@ -89,13 +106,16 @@
 
     <LinearLayout
         android:id="@+id/navigationBar"
-        android:layout_width="match_parent"
-        android:layout_height="65dp"
+        android:layout_width="411dp"
+        android:layout_height="75dp"
         android:background="#4B3083"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
 
         <ImageButton
             android:id="@+id/contactListButton"
@@ -127,6 +147,7 @@
             android:contentDescription="Settings Button"
             android:scaleType="fitCenter"
             android:src="@drawable/settings" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -51,6 +51,7 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
     ArrayList<Contact> contacts = new ArrayList<>();
     Contact currentContact = null;
     RadioButton rbNormal;
+    RadioButton rbSatellite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +77,12 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapFragment);
         mapFragment.getMapAsync(this);
         rbNormal = findViewById(R.id.radioButtonNormal);
+        rbSatellite = findViewById(R.id.radioButtonSatellite);
         rbNormal.setChecked(true);
+        rbNormal.setTextColor(getResources().getColor(R.color.normalMapTextColor));
+        rbSatellite.setTextColor(getResources().getColor(R.color.normalMapTextColor));
+        rbNormal.setButtonTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.normalRadioButtonColor));
+        rbSatellite.setButtonTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.normalRadioButtonColor));
         createLocationRequest();
         createLocationCallback();
 
@@ -182,19 +188,27 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
         }
     }
 
-    private void initMapTypeButtons(){
+    private void initMapTypeButtons() {
         RadioGroup rgMapType = findViewById(R.id.radioGroupMapType);
-        RadioButton rbSatellite = findViewById(R.id.radioButtonSatellite);
-        RadioButton rbNormal = findViewById(R.id.radioButtonNormal);
 
         rgMapType.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == rbNormal.getId()) {
                 gMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                rbNormal.setTextColor(getResources().getColor(R.color.normalMapTextColor));
+                rbSatellite.setTextColor(getResources().getColor(R.color.normalMapTextColor));
+                rbNormal.setButtonTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.normalRadioButtonColor));
+                rbSatellite.setButtonTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.normalRadioButtonColor));
             } else if (checkedId == rbSatellite.getId()) {
                 gMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                rbNormal.setTextColor(getResources().getColor(R.color.satelliteMapTextColor));
+                rbSatellite.setTextColor(getResources().getColor(R.color.satelliteMapTextColor));
+                rbNormal.setButtonTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.satelliteRadioButtonColor));
+                rbSatellite.setButtonTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.satelliteRadioButtonColor));
             }
         });
     }
+
+
 
 
 

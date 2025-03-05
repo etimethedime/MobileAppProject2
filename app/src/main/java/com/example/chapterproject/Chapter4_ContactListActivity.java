@@ -1,12 +1,17 @@
 package com.example.chapterproject;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -24,6 +29,8 @@ public class Chapter4_ContactListActivity extends AppCompatActivity {
     ArrayList<Contact> contacts;
     ContactAdapter contactAdapter;
     RecyclerView contactList;
+    private BroadcastReceiver batteryReceiver;
+
 
     private View.OnClickListener onItemClickListener = view -> {
         RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder) view.getTag();
@@ -73,19 +80,45 @@ public class Chapter4_ContactListActivity extends AppCompatActivity {
 
     }
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
-        String sortBy = getSharedPreferences("MyContactListPreferences", MODE_PRIVATE).getString("sortfield", "contactname");
-        String sortOrder = getSharedPreferences("MyContactListPreferences", MODE_PRIVATE).getString("sortorder", "ASC");
+
+        batteryReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                double batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+                double levelScale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
+                int batteryPercent = (int) Math.floor(batteryLevel / levelScale * 100);
+
+                TextView tvBatteryLevel = findViewById(R.id.batteryLevelTextView);
+                tvBatteryLevel.setText(batteryPercent + "%");
+            }
+        };
+
+        IntentFilter batteryFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        registerReceiver(batteryReceiver, batteryFilter);
+
+        String sortBy = getSharedPreferences("MyContactListPreferences", MODE_PRIVATE)
+                .getString("sortfield", "contactname");
+        String sortOrder = getSharedPreferences("MyContactListPreferences", MODE_PRIVATE)
+                .getString("sortorder", "ASC");
+
         ContactDataSource ds = new ContactDataSource(Chapter4_ContactListActivity.this);
-        try{
+        try {
             ds.open();
             contacts = ds.getContacts(sortBy, sortOrder);
             ds.close();
             contactList.setAdapter(contactAdapter);
             contactAdapter.notifyDataSetChanged();
-        }catch(Exception e){
+        } catch (Exception e) {
             Toast.makeText(this, "Error retrieving contacts", Toast.LENGTH_SHORT).show();
+        }
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (batteryReceiver != null) {
+            unregisterReceiver(batteryReceiver);
         }
     }
 
