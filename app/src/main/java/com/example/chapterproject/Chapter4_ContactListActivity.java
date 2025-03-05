@@ -8,7 +8,6 @@ import android.os.BatteryManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -90,7 +89,7 @@ public class Chapter4_ContactListActivity extends AppCompatActivity {
                 double levelScale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
                 int batteryPercent = (int) Math.floor(batteryLevel / levelScale * 100);
 
-                TextView tvBatteryLevel = findViewById(R.id.batteryLevelTextView);
+                TextView tvBatteryLevel = findViewById(R.id.directionTextView);
                 tvBatteryLevel.setText(batteryPercent + "%");
             }
         };

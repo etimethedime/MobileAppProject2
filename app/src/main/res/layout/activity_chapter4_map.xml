@@ -52,15 +52,56 @@
             android:orientation="horizontal">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="120dp"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1">
 
-                <Switch
-                    android:id="@+id/deleteSwtich"
-                    android:layout_width="115dp"
-                    android:layout_height="35dp"
-                    android:text="Delete"
+                <RadioGroup
+                    android:id="@+id/radioGroupMapType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <RadioButton
+                        android:id="@+id/radioButtonNormal"
+                        android:layout_width="98dp"
+                        android:layout_height="match_parent"
+                        android:text="Normal"
+                        android:textColor="#F6F2F2"
+                        android:textSize="16sp" />
+
+                    <RadioButton
+                        android:id="@+id/radioButtonSatellite"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Satellite"
+                        android:textColor="#F6F2F2"
+                        android:textSize="16sp" />
+                </RadioGroup>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/directionTextView"
+                    android:layout_width="51dp"
+                    android:layout_height="39dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="WNW"
+                    android:textColor="#DED8D8"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -71,32 +112,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1" />
-
-            <TextView
-                android:id="@+id/batteryLevelTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_weight="1"
-                android:text="100%"
-                android:textColor="#DED8D8" />
-
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-
-            <Button
-                android:id="@+id/buttonAddContact"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:backgroundTint="#7FA4E0"
-                android:text="NEW"
-                android:textSize="16sp" />
 
         </LinearLayout>
     </LinearLayout>
@@ -146,35 +161,5 @@
             android:src="@drawable/settings" />
 
     </LinearLayout>
-
-    <RadioGroup
-        android:id="@+id/radioGroupMapType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.887"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.819">
-
-        <RadioButton
-            android:id="@+id/radioButtonNormal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Normal"
-            android:textColor="#F6F2F2"
-            android:textSize="16sp" />
-
-        <RadioButton
-            android:id="@+id/radioButtonSatellite"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Satellite"
-            android:textColor="#F6F2F2"
-            android:textSize="16sp" />
-    </RadioGroup>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

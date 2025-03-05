@@ -4,6 +4,9 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
+import android.hardware.Sensor;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -33,6 +36,7 @@ import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.core.app.ActivityCompat;
@@ -45,6 +49,10 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
 
     final int PERMISSION_REQUEST_CODE = 101;
     GoogleMap gMap;
+    SensorManager sensorManager;
+    Sensor accelerometer;
+    Sensor magnetometer;
+    TextView tvDirection;
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationRequest locationRequest;
     LocationCallback locationCallback;
@@ -60,29 +68,38 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_chapter4_map);
         Bundle extras = getIntent().getExtras();
-        try{
+        try {
             ContactDataSource ds = new ContactDataSource(this);
             ds.open();
-            if(extras != null){
+            if (extras != null) {
                 currentContact = ds.getSpecificContact(extras.getInt("contactid"));
-            }
-            else{
+            } else {
                 contacts = ds.getContacts("CONTACTNAME", "ASC");
             }
             ds.close();
         } catch (Exception e) {
             Toast.makeText(this, "Contact's not found", Toast.LENGTH_LONG).show();
+
         }
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        if (accelerometer == null && magnetometer == null) {
+            sensorManager.registerListener(mySensorEventListener,
+                    accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+            sensorManager.registerListener(mySensorEventListener,
+                    magnetometer, SensorManager.SENSOR_DELAY_FASTEST);
+        } else {
+            Toast.makeText(this, "No sensor available", Toast.LENGTH_LONG).show();
+            Log.d("MapActivity", "No sesnor found");
+        }
+        tvDirection = findViewById(R.id.directionTextView);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapFragment);
         mapFragment.getMapAsync(this);
         rbNormal = findViewById(R.id.radioButtonNormal);
         rbSatellite = findViewById(R.id.radioButtonSatellite);
         rbNormal.setChecked(true);
-        rbNormal.setTextColor(getResources().getColor(R.color.normalMapTextColor));
-        rbSatellite.setTextColor(getResources().getColor(R.color.normalMapTextColor));
-        rbNormal.setButtonTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.normalRadioButtonColor));
-        rbSatellite.setButtonTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.normalRadioButtonColor));
         createLocationRequest();
         createLocationCallback();
 
@@ -109,6 +126,7 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
             }
         }
     }
+
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         gMap = googleMap;
@@ -118,9 +136,9 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
         windowManager.getDefaultDisplay().getSize(size);
         int measuredWidth = size.x;
         int measuredHeight = size.y;
-        if(contacts.size()>0){
+        if (contacts.size() > 0) {
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
-            for (int i=0; i<contacts.size(); i++){
+            for (int i = 0; i < contacts.size(); i++) {
                 currentContact = contacts.get(i);
 
                 Geocoder geocoder = new Geocoder(this);
@@ -129,9 +147,9 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
                         currentContact.getCity() + ", " + currentContact.getState() + " "
                         + currentContact.getZipCode();
 
-                try{
+                try {
                     addresses = geocoder.getFromLocationName(address, 1);
-                }catch (Exception e){
+                } catch (Exception e) {
                     Log.d("MapActivity", "Error", e);
                 }
                 LatLng point = new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
@@ -139,24 +157,22 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
                 gMap.addMarker(new MarkerOptions().position(point).title(currentContact.getContactName()));
             }
             gMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), measuredWidth, measuredHeight, 30));
-        }
-        else{
-            if(currentContact != null){
+        } else {
+            if (currentContact != null) {
                 Geocoder geocoder = new Geocoder(this);
                 List<Address> addresses = null;
                 String address = currentContact.getStreetAddress() + ", " +
                         currentContact.getCity() + ", " + currentContact.getState() + " "
                         + currentContact.getZipCode();
-                try{
+                try {
                     addresses = geocoder.getFromLocationName(address, 1);
-                }catch (Exception e){
+                } catch (Exception e) {
                     Log.d("MapActivity", "Error", e);
                 }
                 LatLng point = new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
                 gMap.addMarker(new MarkerOptions().position(point).title(currentContact.getContactName()).snippet(address));
                 gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 16));
-            }
-            else{
+            } else {
                 AlertDialog alertDialog = new AlertDialog.Builder(this).create();
                 alertDialog.setTitle("No Data");
                 alertDialog.setMessage("No data is available for the mapping function");
@@ -188,30 +204,6 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
         }
     }
 
-    private void initMapTypeButtons() {
-        RadioGroup rgMapType = findViewById(R.id.radioGroupMapType);
-
-        rgMapType.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == rbNormal.getId()) {
-                gMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                rbNormal.setTextColor(getResources().getColor(R.color.normalMapTextColor));
-                rbSatellite.setTextColor(getResources().getColor(R.color.normalMapTextColor));
-                rbNormal.setButtonTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.normalRadioButtonColor));
-                rbSatellite.setButtonTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.normalRadioButtonColor));
-            } else if (checkedId == rbSatellite.getId()) {
-                gMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-                rbNormal.setTextColor(getResources().getColor(R.color.satelliteMapTextColor));
-                rbSatellite.setTextColor(getResources().getColor(R.color.satelliteMapTextColor));
-                rbNormal.setButtonTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.satelliteRadioButtonColor));
-                rbSatellite.setButtonTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.satelliteRadioButtonColor));
-            }
-        });
-    }
-
-
-
-
-
     private void createLocationRequest() {
         locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
                 .setMinUpdateIntervalMillis(500)
@@ -230,6 +222,37 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
                 }
             }
         };
+    }
+
+    private void startLocationUpdates() {
+        if (Build.VERSION.SDK_INT >= 23 &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
+        if (gMap != null) {
+            gMap.setMyLocationEnabled(true);
+        }
+    }
+
+    private void stopLocationUpdates() {
+        if (Build.VERSION.SDK_INT >= 23 &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+    }
+
+    private void initMapTypeButtons() {
+        RadioGroup rgMapType = findViewById(R.id.radioGroupMapType);
+
+        rgMapType.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == rbNormal.getId()) {
+                gMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            } else if (checkedId == rbSatellite.getId()) {
+                gMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+            }
+        });
     }
 
     private void initContactListButton() {
@@ -255,27 +278,53 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
         });
     }
 
-    private void startLocationUpdates() {
-        if (Build.VERSION.SDK_INT >= 23 &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
+    private SensorEventListener mySensorEventListener = new SensorEventListener() {
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
         }
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
-        if (gMap != null) {
-            gMap.setMyLocationEnabled(true);
+
+        float[] accelerometerValues;
+        float[] magnetometerValues;
+
+        @Override
+        public void onSensorChanged(android.hardware.SensorEvent event) {
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                accelerometerValues = event.values;
+            }
+            if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+                magnetometerValues = event.values;
+            }
+            if (accelerometerValues != null && magnetometerValues != null) {
+                float[] R = new float[9];
+                float[] I = new float[9];
+                boolean success = SensorManager.getRotationMatrix(R, I, accelerometerValues, magnetometerValues);
+                if (success) {
+                    float[] orientations = new float[3];
+                    SensorManager.getOrientation(R, orientations);
+                    float azimut = orientations[0];
+                    if (azimut < 0.0f) {
+                        azimut += 360.f;
+                    }
+                    String direction;
+                    if (azimut >= 315 || azimut < 45) {
+                        direction = "N";
+                    } else if (azimut >= 45 && azimut < 135) {
+                        direction = "E";
+                    } else if (azimut >= 135 && azimut < 225) {
+                        direction = "S";
+                    } else {
+                        direction = "W";
+
+                    }
+                    tvDirection.setText(direction);
+                }
+            }
         }
-    }
-
-    private void stopLocationUpdates() {
-        if (Build.VERSION.SDK_INT >= 23 &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-    }
 
 
 
+
+    };
 }
 
 
