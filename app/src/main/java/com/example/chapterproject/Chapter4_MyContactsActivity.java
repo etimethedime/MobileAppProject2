@@ -1,6 +1,10 @@
 package com.example.chapterproject;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.telephony.PhoneNumberUtils;
 import android.text.Editable;
@@ -14,16 +18,23 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 import androidx.activity.EdgeToEdge;
 import android.text.format.DateFormat;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Calendar;
 import java.util.Locale;
 
 public class Chapter4_MyContactsActivity extends AppCompatActivity implements DatePickerDialogue.SaveDateListener {
     private Contact currentContact;
+    final int PERMISSION_REQUEST_PHONE = 102;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,16 +52,16 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
         initSettingsButton();
         initToggleButton();
         Bundle extras = getIntent().getExtras();
-        if(extras != null) {
+        if (extras != null) {
             initContact(extras.getLong("contactId"));
-        }
-        else{
+        } else {
             currentContact = new Contact();
         }
         setForEditing(false);
         initChangeDateButton();
         initSaveButton();
         initTextChangedEvents();
+        initCallFunction();
 
     }
 
@@ -62,20 +73,21 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
             startActivity(listIntent);
         });
     }
+
     private void initMapButton() {
         ImageButton mapButton = findViewById(R.id.contactMapButton);
         mapButton.setOnClickListener(v -> {
             Intent listIntent = new Intent(Chapter4_MyContactsActivity.this, Chapter4_MapActivity.class);
-            if(currentContact.getId() == -1) {
+            if (currentContact.getId() == -1) {
                 Toast.makeText(this, "Contact must be saved before displaying location", Toast.LENGTH_LONG).show();
-            }
-            else{
+            } else {
                 listIntent.putExtra("contactId", currentContact.getId());
             }
             listIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(listIntent);
         });
     }
+
     private void initSettingsButton() {
         ImageButton settingsButton = findViewById(R.id.contactSettingsButton);
         settingsButton.setOnClickListener(v -> {
@@ -126,13 +138,13 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
     }
 
 
-
     private void initToggleButton() {
         ToggleButton toggleButton = findViewById(R.id.onOffButton);
         toggleButton.setOnClickListener(v -> {
             setForEditing(toggleButton.isChecked());
         });
     }
+
     private void initChangeDateButton() {
         Button changeDateButton = findViewById(R.id.changeBirthdayButton);
         changeDateButton.setOnClickListener(v -> {
@@ -140,6 +152,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
             datePickerDialogue.show(getSupportFragmentManager(), "date picker");
         });
     }
+
     private void initContact(long id) {
         ContactDataSource ds = new ContactDataSource(Chapter4_MyContactsActivity.this);
         try {
@@ -172,36 +185,35 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
 
 
     private void setForEditing(boolean enabled) {
-       EditText editName = findViewById(R.id.nameText);
-       EditText editStreet = findViewById(R.id.streetText);
-       EditText editCity = findViewById(R.id.cityText);
-       EditText editState = findViewById(R.id.stateText);
-       EditText editZipcode = findViewById(R.id.zipcodeText);
-       EditText editCell = findViewById(R.id.cellNumberText);
-       EditText editHome = findViewById(R.id.homePhoneText);
-       EditText editEmail = findViewById(R.id.emailText);
-       EditText editBirthday = findViewById(R.id.birthdayText);
-       Button changeDateButton = findViewById(R.id.changeBirthdayButton);
-       Button saveButton = findViewById(R.id.buttonAddContact);
+        EditText editName = findViewById(R.id.nameText);
+        EditText editStreet = findViewById(R.id.streetText);
+        EditText editCity = findViewById(R.id.cityText);
+        EditText editState = findViewById(R.id.stateText);
+        EditText editZipcode = findViewById(R.id.zipcodeText);
+        EditText editCell = findViewById(R.id.cellNumberText);
+        EditText editHome = findViewById(R.id.homePhoneText);
+        EditText editEmail = findViewById(R.id.emailText);
+        EditText editBirthday = findViewById(R.id.birthdayText);
+        Button changeDateButton = findViewById(R.id.changeBirthdayButton);
+        Button saveButton = findViewById(R.id.buttonAddContact);
 
-       editName.setEnabled(enabled);
-       editStreet.setEnabled(enabled);
-       editCity.setEnabled(enabled);
-       editState.setEnabled(enabled);
-       editZipcode.setEnabled(enabled);
-       editCell.setEnabled(enabled);
-       editHome.setEnabled(enabled);
-       editEmail.setEnabled(enabled);
-       editBirthday.setEnabled(enabled);
-       changeDateButton.setEnabled(enabled);
-       saveButton.setEnabled(enabled);
+        editName.setEnabled(enabled);
+        editStreet.setEnabled(enabled);
+        editCity.setEnabled(enabled);
+        editState.setEnabled(enabled);
+        editZipcode.setEnabled(enabled);
+        editCell.setEnabled(enabled);
+        editHome.setEnabled(enabled);
+        editEmail.setEnabled(enabled);
+        editBirthday.setEnabled(enabled);
+        changeDateButton.setEnabled(enabled);
+        saveButton.setEnabled(enabled);
 
-       if (enabled) {
-           editName.requestFocus();
-       }
+        if (enabled) {
+            editName.requestFocus();
+        }
 
     }
-
 
 
     @Override
@@ -210,6 +222,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
         birthDay.setText(DateFormat.format("MM/dd/yyyy", selectedDate));
         currentContact.setBirthday(selectedDate.toString());
     }
+
     private void initTextChangedEvents() {
         final EditText etName = findViewById(R.id.nameText);
         etName.addTextChangedListener(new TextWatcher() {
@@ -300,10 +313,12 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
         final EditText etCell = findViewById(R.id.cellNumberText);
         etCell.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -315,10 +330,12 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
         final EditText etHome = findViewById(R.id.homePhoneText);
         etHome.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -344,5 +361,72 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
                 currentContact.setEmail(s.toString());
             }
         });
+    }
+
+    private void initCallFunction() {
+        EditText editHome = findViewById(R.id.homePhoneText);
+        editHome.setOnLongClickListener(v -> {
+                checkPhonePermission(currentContact.getHomePhoneNumber());
+                return false;
+            });
+
+        EditText editCell = findViewById(R.id.cellNumberText);
+        editCell.setOnLongClickListener(v -> {
+                checkPhonePermission(currentContact.getCellNumber());
+                return false;
+            });
+    }
+
+    private void checkPhonePermission(String phoneNumber) {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (ContextCompat.checkSelfPermission(Chapter4_MyContactsActivity.this, Manifest.permission.CALL_PHONE)
+                    != getPackageManager().PERMISSION_GRANTED) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale
+                        (Chapter4_MyContactsActivity.this,
+                                Manifest.permission.CALL_PHONE)) {
+                    Snackbar.make(findViewById(R.id.main), "Permission Required", Snackbar.LENGTH_INDEFINITE)
+                            .setAction("OK", v -> {
+                                ActivityCompat.requestPermissions(Chapter4_MyContactsActivity.this,
+                                        new String[]{Manifest.permission.CALL_PHONE}, 1);
+                            }).show();
+                } else {
+                    ActivityCompat.requestPermissions
+                            (Chapter4_MyContactsActivity.this, new String[]{Manifest.permission.CALL_PHONE}, PERMISSION_REQUEST_PHONE);
+                }
+            } else {
+                callContact(phoneNumber);
+            }
+        }
+        else{
+            callContact(phoneNumber);
+        }
+
+    }
+    private void callContact(String phoneNumber){
+        Intent intent = new Intent(Intent.ACTION_CALL);
+        intent.setData(Uri.parse("tel:" + phoneNumber));
+        if (Build.VERSION.SDK_INT>=23 && ContextCompat.checkSelfPermission(getBaseContext(),Manifest.permission.CALL_PHONE)
+                != PackageManager.PERMISSION_GRANTED){
+            return;
+        }
+        else{
+            startActivity(intent);
+        }
+
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case PERMISSION_REQUEST_PHONE:{
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    Toast.makeText(this, "Permission to call granted", Toast.LENGTH_LONG).show();
+                }
+                else{
+                    Toast.makeText(this, "Permission to call not granted", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+
     }
 }
