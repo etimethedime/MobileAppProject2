@@ -1,5 +1,7 @@
 package com.example.chapterproject;
 
+import android.graphics.Bitmap;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -16,6 +18,7 @@ public class Contact {
     private String cellNumber;
     private String email;
     private Calendar birthday;
+    private Bitmap picture;
 
     public Contact() {
         id = -1;
@@ -68,6 +71,9 @@ public class Contact {
             e.printStackTrace();
         }
     }
+    public void setPicture(Bitmap picture){
+        this.picture = picture;
+    }
 
 
     public long getId() {
@@ -109,4 +115,6 @@ public class Contact {
     public String getBirthday() {
         return dateFormat.format(birthday.getTime());
     }
+
+    public Bitmap getPicture() {return picture;}
 }

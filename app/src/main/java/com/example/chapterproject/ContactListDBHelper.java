@@ -1,6 +1,5 @@
 package com.example.chapterproject;
 
-
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -8,14 +7,20 @@ import android.util.Log;
 
 public class ContactListDBHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "MyContactList.db";
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
 
-    private static final String CREATE_TABLE_CONTACT = "create table contact (" +
-            "_id integer primary key autoincrement, " +
-            "contactname text not null, streetaddress text, " +
-            "city text, state text, zipcode text, " +
-            "phonenumber text, cellnumber text, email text, " +
-            "birthday text);";
+    private static final String CREATE_TABLE_CONTACT = "CREATE TABLE contact (" +
+            "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "contactname TEXT NOT NULL, " +
+            "streetaddress TEXT, " +
+            "city TEXT, " +
+            "state TEXT, " +
+            "zipcode TEXT, " +
+            "phonenumber TEXT, " +
+            "cellnumber TEXT, " +
+            "email TEXT, " +
+            "birthday TEXT, " +
+            "contactphoto BLOB);";
 
     public ContactListDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -28,11 +33,12 @@ public class ContactListDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.w(ContactListDBHelper.class.getName(),
-                "Upgrading database from version " + oldVersion + " to " + newVersion +
-                        ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS contact");
-        onCreate(db);
+        if (oldVersion < 2) {
+            try {
+                db.execSQL("ALTER TABLE contact ADD COLUMN contactphoto BLOB");
+            } catch (Exception e) {
+                Log.e("DB Upgrade", "Error adding column contactphoto", e);
+            }
+        }
     }
 }
-

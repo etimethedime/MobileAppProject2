@@ -3,11 +3,13 @@ package com.example.chapterproject;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.telephony.PhoneNumberUtils;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.Button;
@@ -34,7 +36,11 @@ import java.util.Locale;
 
 public class Chapter4_MyContactsActivity extends AppCompatActivity implements DatePickerDialogue.SaveDateListener {
     private Contact currentContact;
+    private Bitmap picture;
     final int PERMISSION_REQUEST_PHONE = 102;
+    final int PERMISSION_REQUEST_CAMERA = 103;
+    final int CAMERA_REQUEST = 1888;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +68,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
         initSaveButton();
         initTextChangedEvents();
         initCallFunction();
+        initContactImageButton();
 
     }
 
@@ -94,6 +101,34 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
             Intent listIntent = new Intent(Chapter4_MyContactsActivity.this, Chapter4_SettingsActivity.class);
             listIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(listIntent);
+        });
+    }
+    private void initContactImageButton(){
+        ImageButton contactImageButton = findViewById(R.id.imageButtonContactPhoto);
+        contactImageButton.setOnClickListener(v -> {
+            if (Build.VERSION.SDK_INT >= 23) {
+                if (ContextCompat.checkSelfPermission(Chapter4_MyContactsActivity.this,
+                        Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                            if (ActivityCompat.shouldShowRequestPermissionRationale
+                                    (Chapter4_MyContactsActivity.this, Manifest.permission.CAMERA)) {
+                                Log.d("Camera Acess", "Permission Asked");
+                                Snackbar.make(findViewById(R.id.main), "Permission Required", Snackbar.LENGTH_INDEFINITE).
+                                        setAction("Ok", v1 -> {
+                                            ActivityCompat.requestPermissions(Chapter4_MyContactsActivity.this,
+                                                    new String[]{Manifest.permission.CAMERA}, PERMISSION_REQUEST_CAMERA);
+                                        }).show();
+                            }
+                            else {
+                                ActivityCompat.requestPermissions(Chapter4_MyContactsActivity.this, new String[]{Manifest.permission.CAMERA}, PERMISSION_REQUEST_CAMERA);
+                            }
+                }
+                else{
+                    takePhoto();
+                }
+            }
+            else{
+                takePhoto();
+            }
         });
     }
 
@@ -171,6 +206,7 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
         EditText editHome = findViewById(R.id.homePhoneText);
         EditText editEmail = findViewById(R.id.emailText);
         EditText editBirthday = findViewById(R.id.birthdayText);
+        ImageButton picture = (ImageButton) findViewById(R.id.imageButtonContactPhoto);
 
         editName.setText(currentContact.getContactName());
         editStreet.setText(currentContact.getStreetAddress());
@@ -181,6 +217,13 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
         editHome.setText(currentContact.getHomePhoneNumber());
         editEmail.setText(currentContact.getEmail());
         editBirthday.setText(currentContact.getBirthday());
+        if (currentContact.getPicture() != null) {
+            picture.setImageBitmap(currentContact.getPicture());
+        }
+        else{
+            picture.setImageResource(R.drawable.contact_photo);
+        }
+
     }
 
 
@@ -196,21 +239,27 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
         EditText editBirthday = findViewById(R.id.birthdayText);
         Button changeDateButton = findViewById(R.id.changeBirthdayButton);
         Button saveButton = findViewById(R.id.buttonAddContact);
+        ImageButton contactImageButton = findViewById(R.id.imageButtonContactPhoto);
 
         editName.setEnabled(enabled);
         editStreet.setEnabled(enabled);
         editCity.setEnabled(enabled);
         editState.setEnabled(enabled);
         editZipcode.setEnabled(enabled);
-        editCell.setEnabled(enabled);
-        editHome.setEnabled(enabled);
         editEmail.setEnabled(enabled);
         editBirthday.setEnabled(enabled);
         changeDateButton.setEnabled(enabled);
         saveButton.setEnabled(enabled);
+        contactImageButton.setEnabled(enabled);
+
 
         if (enabled) {
             editName.requestFocus();
+            editCell.setInputType(InputType.TYPE_NULL);
+            editHome.setInputType(InputType.TYPE_NULL);
+        } else {
+            editCell.setInputType(InputType.TYPE_CLASS_PHONE);
+            editHome.setInputType(InputType.TYPE_CLASS_PHONE);
         }
 
     }
@@ -416,17 +465,41 @@ public class Chapter4_MyContactsActivity extends AppCompatActivity implements Da
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.d("Permission", "Request triggered");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
-            case PERMISSION_REQUEST_PHONE:{
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        switch (requestCode) {
+            case PERMISSION_REQUEST_PHONE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Permission to call granted", Toast.LENGTH_LONG).show();
-                }
-                else{
+                } else {
                     Toast.makeText(this, "Permission to call not granted", Toast.LENGTH_LONG).show();
                 }
             }
+            case PERMISSION_REQUEST_CAMERA: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    takePhoto();
+                } else {
+                    Toast.makeText(this, "Permission to camera not granted", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
         }
+    }
 
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == CAMERA_REQUEST){
+            if(resultCode == RESULT_OK){
+                Bitmap photo = (Bitmap) data.getExtras().get("data");
+                Bitmap scaledPhoto = Bitmap.createScaledBitmap(photo, 100, 100, true);
+                ImageButton imageButton = findViewById(R.id.imageButtonContactPhoto);
+                imageButton.setImageBitmap(scaledPhoto);
+                currentContact.setPicture(scaledPhoto);
+            }
+        }
+    }
+    public void takePhoto(){
+        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(cameraIntent, PERMISSION_REQUEST_CAMERA);
     }
 }

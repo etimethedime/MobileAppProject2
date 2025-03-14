@@ -4,8 +4,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 public class ContactDataSource {
@@ -37,6 +41,12 @@ public class ContactDataSource {
             initialValues.put("cellnumber", c.getCellNumber());
             initialValues.put("email", c.getEmail());
             initialValues.put("birthday", c.getBirthday());
+            if (c.getPicture() != null) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                c.getPicture().compress(Bitmap.CompressFormat.PNG, 100, baos);
+                byte[] photo = baos.toByteArray();
+                initialValues.put("contactphoto", photo);
+            }
 
             long result = database.insert("contact", null, initialValues);
 
@@ -45,6 +55,7 @@ public class ContactDataSource {
             } else {
                 Log.e("ContactDataSource", "Error inserting contact into database");
             }
+
         } catch (Exception e) {
             Log.e("ContactDataSource", "Error during contact insertion", e);
         }
@@ -65,6 +76,12 @@ public class ContactDataSource {
             updateValues.put("cellnumber", c.getCellNumber());
             updateValues.put("email", c.getEmail());
             updateValues.put("birthday", c.getBirthday());
+            if (c.getPicture() != null) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                c.getPicture().compress(Bitmap.CompressFormat.PNG, 100, baos);
+                byte[] photo = baos.toByteArray();
+                updateValues.put("contactphoto", photo);
+            }
 
             int rowsUpdated = database.update("contact", updateValues, "_id=" + rowId, null);
 
@@ -164,6 +181,12 @@ public class ContactDataSource {
             contact.setCellNumber(cursor.getString(7));
             contact.setEmail(cursor.getString(8));
             contact.setBirthday(cursor.getString(9));
+            byte[] photo = cursor.getBlob(10);
+            if(photo != null){
+               ByteArrayInputStream bais = new ByteArrayInputStream(photo);
+               Bitmap thePicture = BitmapFactory.decodeStream(bais);
+               contact.setPicture(thePicture);
+            }
             cursor.close();
         }
         return contact;
