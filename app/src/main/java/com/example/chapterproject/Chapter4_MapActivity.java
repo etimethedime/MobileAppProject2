@@ -72,14 +72,20 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
             ContactDataSource ds = new ContactDataSource(this);
             ds.open();
             if (extras != null) {
-                currentContact = ds.getSpecificContact(extras.getInt("contactid"));
+                int contactId = extras.getInt("contactid");
+                Log.d("MapActivity", "Received contact ID: " + contactId);
+                currentContact = ds.getSpecificContact(contactId);
+                if (currentContact != null) {
+                    Log.d("MapActivity", "Retrieved contact: " + currentContact.getContactName());
+                } else {
+                    Log.d("MapActivity", "No contact found with ID: " + contactId);
+                }
             } else {
                 contacts = ds.getContacts("CONTACTNAME", "ASC");
             }
             ds.close();
         } catch (Exception e) {
             Toast.makeText(this, "Contact's not found", Toast.LENGTH_LONG).show();
-
         }
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -109,6 +115,7 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
         initMapTypeButtons();
     }
 
+
     @Override
     public void onPause() {
         super.onPause();
@@ -136,6 +143,7 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
         windowManager.getDefaultDisplay().getSize(size);
         int measuredWidth = size.x;
         int measuredHeight = size.y;
+
         if (contacts.size() > 0) {
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             for (int i = 0; i < contacts.size(); i++) {
@@ -152,9 +160,14 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
                 } catch (Exception e) {
                     Log.d("MapActivity", "Error", e);
                 }
-                LatLng point = new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
-                builder.include(point);
-                gMap.addMarker(new MarkerOptions().position(point).title(currentContact.getContactName()));
+
+                if (addresses != null && !addresses.isEmpty()) {
+                    LatLng point = new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
+                    builder.include(point);
+                    gMap.addMarker(new MarkerOptions().position(point).title(currentContact.getContactName()).snippet(address));
+                } else {
+                    Log.d("MapActivity", "No address found for: " + currentContact.getContactName());
+                }
             }
             gMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), measuredWidth, measuredHeight, 30));
         } else {
@@ -169,19 +182,24 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
                 } catch (Exception e) {
                     Log.d("MapActivity", "Error", e);
                 }
-                LatLng point = new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
-                gMap.addMarker(new MarkerOptions().position(point).title(currentContact.getContactName()).snippet(address));
-                gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 16));
+
+                if (addresses != null && !addresses.isEmpty()) {
+                    LatLng point = new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
+                    gMap.addMarker(new MarkerOptions().position(point).title(currentContact.getContactName()).snippet(address));
+                    gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 16));
+                } else {
+                    Log.d("MapActivity", "No address found for current contact");
+                    Toast.makeText(this, "No address found for this contact", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 AlertDialog alertDialog = new AlertDialog.Builder(this).create();
                 alertDialog.setTitle("No Data");
                 alertDialog.setMessage("No data is available for the mapping function");
                 alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
-                        (dialog, which) -> dialog.dismiss());
-                alertDialog.show();
-            }
-
-        }
+                (dialog, which) -> dialog.dismiss());
+        alertDialog.show();
+    }
+}
 
         try {
             if (Build.VERSION.SDK_INT >= 23) {
@@ -203,6 +221,7 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
             Toast.makeText(this, "Error. Location not available", Toast.LENGTH_LONG).show();
         }
     }
+
 
     private void createLocationRequest() {
         locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)

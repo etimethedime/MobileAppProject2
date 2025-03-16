@@ -1,12 +1,16 @@
 package com.example.chapterproject;
 
 import android.graphics.Bitmap;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-public class Contact {
+public class Contact implements Parcelable {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
     private long id;
     private String contactName;
@@ -24,7 +28,6 @@ public class Contact {
         id = -1;
         birthday = Calendar.getInstance();
     }
-
 
     public void setId(long id) {
         this.id = id;
@@ -71,10 +74,10 @@ public class Contact {
             e.printStackTrace();
         }
     }
-    public void setPicture(Bitmap picture){
+
+    public void setPicture(Bitmap picture) {
         this.picture = picture;
     }
-
 
     public long getId() {
         return id;
@@ -116,5 +119,53 @@ public class Contact {
         return dateFormat.format(birthday.getTime());
     }
 
-    public Bitmap getPicture() {return picture;}
+    public Bitmap getPicture() {
+        return picture;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeString(contactName);
+        dest.writeString(streetAddress);
+        dest.writeString(city);
+        dest.writeString(state);
+        dest.writeString(zipCode);
+        dest.writeString(phoneNumber);
+        dest.writeString(cellNumber);
+        dest.writeString(email);
+        dest.writeSerializable(birthday);
+        dest.writeParcelable(picture, flags);
+    }
+
+    protected Contact(Parcel in) {
+        id = in.readLong();
+        contactName = in.readString();
+        streetAddress = in.readString();
+        city = in.readString();
+        state = in.readString();
+        zipCode = in.readString();
+        phoneNumber = in.readString();
+        cellNumber = in.readString();
+        email = in.readString();
+        birthday = (Calendar) in.readSerializable();
+        picture = in.readParcelable(Bitmap.class.getClassLoader());
+    }
+
+    public static final Creator<Contact> CREATOR = new Creator<Contact>() {
+        @Override
+        public Contact createFromParcel(Parcel in) {
+            return new Contact(in);
+        }
+
+        @Override
+        public Contact[] newArray(int size) {
+            return new Contact[size];
+        }
+    };
 }
