@@ -63,7 +63,6 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_chapter4_map);
@@ -72,9 +71,9 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
             ContactDataSource ds = new ContactDataSource(this);
             ds.open();
             if (extras != null) {
-                int contactId = extras.getInt("contactid");
+                Long contactId = extras.getLong("contactId"); // Corrected key name
                 Log.d("MapActivity", "Received contact ID: " + contactId);
-                currentContact = ds.getSpecificContact(contactId);
+                currentContact = ds.getSpecificContact(contactId.intValue()); // Cast to int
                 if (currentContact != null) {
                     Log.d("MapActivity", "Retrieved contact: " + currentContact.getContactName());
                 } else {
@@ -92,12 +91,12 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         if (accelerometer == null && magnetometer == null) {
             sensorManager.registerListener(mySensorEventListener,
-                    accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+                    accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
             sensorManager.registerListener(mySensorEventListener,
-                    magnetometer, SensorManager.SENSOR_DELAY_FASTEST);
+                    magnetometer, SensorManager.SENSOR_DELAY_NORMAL);
         } else {
             Toast.makeText(this, "No sensor available", Toast.LENGTH_LONG).show();
-            Log.d("MapActivity", "No sesnor found");
+            Log.d("MapActivity", "No sensor found");
         }
         tvDirection = findViewById(R.id.directionTextView);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -138,69 +137,70 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
     public void onMapReady(@NonNull GoogleMap googleMap) {
         gMap = googleMap;
         gMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
         Point size = new Point();
         WindowManager windowManager = getWindowManager();
         windowManager.getDefaultDisplay().getSize(size);
         int measuredWidth = size.x;
         int measuredHeight = size.y;
 
-        if (contacts.size() > 0) {
-            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-            for (int i = 0; i < contacts.size(); i++) {
-                currentContact = contacts.get(i);
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        boolean hasValidLocation = false;
 
-                Geocoder geocoder = new Geocoder(this);
-                List<Address> addresses = null;
-                String address = currentContact.getStreetAddress() + ", " +
-                        currentContact.getCity() + ", " + currentContact.getState() + " "
-                        + currentContact.getZipCode();
+        Geocoder geocoder = new Geocoder(this);
+
+        if (contacts.size() > 0) {
+            for (Contact contact : contacts) {
+                String address = contact.getStreetAddress() + ", " +
+                        contact.getCity() + ", " + contact.getState() + " " + contact.getZipCode();
 
                 try {
-                    addresses = geocoder.getFromLocationName(address, 1);
+                    List<Address> addresses = geocoder.getFromLocationName(address, 1);
+                    if (addresses != null && !addresses.isEmpty()) {
+                        LatLng point = new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
+                        builder.include(point);
+                        gMap.addMarker(new MarkerOptions().position(point).title(contact.getContactName()).snippet(address));
+                        hasValidLocation = true;
+                    } else {
+                        Log.d("MapActivity", "No address found for: " + contact.getContactName());
+                    }
                 } catch (Exception e) {
-                    Log.d("MapActivity", "Error", e);
-                }
-
-                if (addresses != null && !addresses.isEmpty()) {
-                    LatLng point = new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
-                    builder.include(point);
-                    gMap.addMarker(new MarkerOptions().position(point).title(currentContact.getContactName()).snippet(address));
-                } else {
-                    Log.d("MapActivity", "No address found for: " + currentContact.getContactName());
+                    Log.d("MapActivity", "Geocoding error for: " + contact.getContactName(), e);
                 }
             }
-            gMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), measuredWidth, measuredHeight, 30));
+
+            if (hasValidLocation) {
+                gMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), measuredWidth, measuredHeight, 600));
+            } else {
+                Toast.makeText(this, "No valid locations found", Toast.LENGTH_SHORT).show();
+            }
         } else {
             if (currentContact != null) {
-                Geocoder geocoder = new Geocoder(this);
-                List<Address> addresses = null;
                 String address = currentContact.getStreetAddress() + ", " +
-                        currentContact.getCity() + ", " + currentContact.getState() + " "
-                        + currentContact.getZipCode();
-                try {
-                    addresses = geocoder.getFromLocationName(address, 1);
-                } catch (Exception e) {
-                    Log.d("MapActivity", "Error", e);
-                }
+                        currentContact.getCity() + ", " + currentContact.getState() + " " + currentContact.getZipCode();
 
-                if (addresses != null && !addresses.isEmpty()) {
-                    LatLng point = new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
-                    gMap.addMarker(new MarkerOptions().position(point).title(currentContact.getContactName()).snippet(address));
-                    gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 16));
-                } else {
-                    Log.d("MapActivity", "No address found for current contact");
-                    Toast.makeText(this, "No address found for this contact", Toast.LENGTH_SHORT).show();
+                try {
+                    List<Address> addresses = geocoder.getFromLocationName(address, 1);
+                    if (addresses != null && !addresses.isEmpty()) {
+                        LatLng point = new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
+                        gMap.addMarker(new MarkerOptions().position(point).title(currentContact.getContactName()).snippet(address));
+                        gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 16));
+                    } else {
+                        Log.d("MapActivity", "No address found for current contact");
+                        Toast.makeText(this, "No address found for this contact", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    Log.d("MapActivity", "Geocoding error", e);
                 }
             } else {
                 AlertDialog alertDialog = new AlertDialog.Builder(this).create();
                 alertDialog.setTitle("No Data");
                 alertDialog.setMessage("No data is available for the mapping function");
                 alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
-                (dialog, which) -> dialog.dismiss());
-        alertDialog.show();
-    }
-}
-
+                        (dialog, which) -> dialog.dismiss());
+                alertDialog.show();
+            }
+        }
         try {
             if (Build.VERSION.SDK_INT >= 23) {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -221,6 +221,7 @@ public class Chapter4_MapActivity extends AppCompatActivity implements OnMapRead
             Toast.makeText(this, "Error. Location not available", Toast.LENGTH_LONG).show();
         }
     }
+
 
 
     private void createLocationRequest() {
